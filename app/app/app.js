@@ -4,9 +4,10 @@ var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
+var cors = require('cors');
 
-var index = require('./routes/index');
-var users = require('./routes/users');
+var cliente = require('./routes/cliente');
+var contrato = require('./routes/contrato');
 
 var app = express();
 
@@ -22,8 +23,17 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.use('/', index);
-app.use('/users', users);
+app.use(cors());
+
+app.use(function(req, res, next) {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+  next();
+});
+
+
+app.use('/cliente', cliente);
+app.use('/contrato', contrato);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
