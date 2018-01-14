@@ -1,23 +1,66 @@
 class Cliente{
 
+    
+
+    _setValues(req){
+        Object.entries(req).forEach(
+            ([key, value]) =>{
+                if(key === "dt_nascimento"){
+                    this[key] = new Date( Date.now( ) ).toISOString();
+                }
+                else{
+                    this[key] = value;
+                }
+            }  );
+    }
     constructor(req){
-        this.nome			 = req.nome;
-        this.dt_nascimento	 = req.dt_nascimento;
-        this.cpf		     = req.cpf;		
-        this.rg				 = req.rg;
-        this.orgao_Exp		 = req.orgao_Exp;
-        this.endereco_id     = req.endereco_id;		
-        this.email			 = req.email;
-        this.telefone		 = req.telefone;
-        this.celular		 = req.celular;
+        this.nome			    = "";
+        this.dt_nascimento	    = new Date( Date.now( ) ).toISOString();
+        this.cpf		            = "";		
+        this.rg				    = "";
+        this.orgao_Exp		    = "";
+        this.endereco_id         = "";		
+        this.email			    = "";
+        this.telefone		    = "";
+        this.celular		        = "";
+
+        this._setValues(req);
     }
 
-    get_nome( ){
-        return this.nome;
+    getAttribures(){
+        return this;
     }
 
-    get_dt_nascimento( ){
-        return this.dt_nascimento;
+    _getTable(){
+        return "t_cliente";
+    }
+
+
+    getDbInsertQuery( ){
+
+        let str;
+        let fields = "";
+        let values = "";
+
+        str = "INSERT INTO " + this._getTable() + "(";
+        
+        Object.entries(this).forEach(
+            ([key, value]) => {
+                if(fields===""){
+                    fields =  key; 
+                    values = "${" + key + "}";
+                }  
+                else{
+                    fields = fields   + ", " + key;
+                    values = values + ", " + "${" + key + "}";
+                }
+            });
+            
+            fields = fields + ")";
+            values = values + ")";
+            
+        str = str + fields + ' VALUES(' + values;
+        return str;
     }
 
 }

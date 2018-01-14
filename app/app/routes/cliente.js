@@ -5,9 +5,20 @@ var clienteModel = require('../model/cliente')
 
 /* GET users listing. */
 router.get('/', function(req, res, next) {
-    getAllClientes(req, res, next);
+   
+  getAllClientes( )
+  .then((result) => {
+    res.status(200) 
+    .json({
+       status: 'success',
+       data: result,
+       message: 'All clientes'
+    })
+  })
+  .catch((error) => {
+    return next(error);
+  });
 
-//  res.send('Cliente OK');
 });
 
 router.post('/', function(req, res, next) {
@@ -16,30 +27,41 @@ router.post('/', function(req, res, next) {
 //  res.send('Cliente OK');
 });
 
+async function getAllClientes( ){
+
+  
+  return new Promise((resolve,reject)=>{
+    try {
+      var data = getAllClientesDB( );
+      resolve(data);
+    } catch (error) {
+      reject(error);
+    }  
+  });
+
+}
 
 
-function getAllClientes(req,res,next){
-  db.any('select * from t_cliente')
+async function getAllClientesDB( ){
+
+  return new Promise((resolve,reject) =>{
+    db.any('select * from t_cliente')
     .then((data) => {
-      res.status(200)
-        .json({
-          status: 'success',
-          data: data,
-          message: 'Retrieved ALL clientes'
-        });
+      resolve(data);
     })
-    .catch(function (err) {
-      return next(err);
+    .catch((err)  => {
+      reject(err);
+      //return next(err);
     });
-};
+
+  }
+)};
 
 function createCliente(req, res, next){
   let cliente;
   cliente = new clienteModel(req.body);
-  console.log('Log ' + req.body.nome );
-  db.oneOrNone('insert into t_cliente(nome, endereco_id)' +
-    'values(${nome}, ${endereco_id})',
-    req.body)
+  db.oneOrNone( cliente.getDbInsertQuery( ),
+  cliente.getAttribures())
    .then(() => {
        console.log('Dados inseridos');
        res.status(200)
