@@ -5,79 +5,68 @@ var clienteModel = require('../model/cliente')
 
 /* GET users listing. */
 router.get('/', function(req, res, next) {
-   
-  getAllClientes( )
-  .then((result) => {
-    res.status(200) 
-    .json({
-       status: 'success',
-       data: result,
-       message: 'All clientes'
-    })
-  })
-  .catch((error) => {
-    return next(error);
-  });
-
+  getAllClientes(req, res, next);
 });
 
 router.get('/:cliente_id', (req,res,next) =>{
   
-  getClienteById(req.params.cliente_id)
-  .then((result)=>{
+  try {
+    let result = getClienteById(req.params.cliente_id);
     res.status(200) 
     .json({
        status: 'success',
-       data: result,
+       data:    result,
        message: 'Cliente' + req.params.id
     })
-  })
-  .catch((err)=>{
+  } catch (error) {
     return next(err);
-  });
+  }
 
 });
 
 router.post('/', function(req, res, next) {
   createCliente(req, res, next);
-
-//  res.send('Cliente OK');
 });
 
+router.put('/:cliente_id',(req,res,next) =>{
+  updateCliente(req,res,next);
+});
 
+async function getAllClientes(req, res, next){
+  let result;
+  try {
+    result = await getAllClientesDB( );
+    res.status(200) 
+    .json({
+       status: 'success',
+       data: result,
+       message: 'All clientes'
+    })  
 
+  } catch (error) {
+    next(error);
+  }
 
-async function getAllClientes( ){
-
-  return new Promise((resolve,reject)=>{
-    try {
-      var data = getAllClientesDB( );
-      resolve(data);
-    } catch (error) {
-      reject(error);
-    }  
-  });
 }
 
 async function getAllClientesDB( ){
 
   return new Promise((resolve,reject) =>{
-    db.any('select * from t_cliente')
-    .then((data) => {
-      resolve(data);
-    })
-    .catch((err)  => {
-      reject(err);
-    });
 
-  }
-)};
+    try {
+      let data = db.any('select * from t_cliente');
+      resolve(data);  
+    } catch (error) {
+      reject(error);
+    }
+    });
+  };
 
 async function getClienteById( id ){
 
   return new Promise((resolve,reject)=>{
     try {
-      let data = getClienteById( id );
+      let data = getClienteByIdDB( id );
       resolve(data);
     } catch (error) {
       reject(error);
@@ -86,26 +75,24 @@ async function getClienteById( id ){
 
 }
 
-async function getClienteById( id ){
+async function getClienteByIdDB( id ){
 
   return new Promise((resolve,reject) =>{
-    db.one('select * from t_cliente where t_cliente.cliente_id = $1', [id] )
-    .then((data) => {
-      resolve(data);
-    })
-    .catch((err)  => {
-      reject(err);
-    });
-
+  try {
+    let result = db.one('select * from t_cliente where' +
+                      + ' t_cliente.cliente_id = $1', [id] );
+    resolve(result);
+    } catch (error) {
+      reject(error);
+    }
   }
 )};
-
 
 function createCliente(req, res, next){
   let cliente;
   cliente = new clienteModel(req.body);
   db.oneOrNone( cliente.getDbInsertQuery( ),
-  cliente.getAttribures())
+  cliente.getAttributes())
    .then(() => {
        console.log('Dados inseridos');
        res.status(200)
@@ -118,9 +105,25 @@ function createCliente(req, res, next){
        console.log('Erro: ' + err);
        return next(err)
    })
+}
+
+async function updateCliente(req,res,next){
+
+  
+  try {
+    let result;
+    let cliente = new clienteModel(req.body);
+    db.none('')
+
+    res.status(200)
+    .json({status: 'sucess',
+           message: 'Client updated'})
+    
+  } catch (error) {
+    next(error);  
+  }
 
 
 }
-
 
 module.exports = router;

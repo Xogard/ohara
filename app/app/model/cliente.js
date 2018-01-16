@@ -1,7 +1,7 @@
 class Cliente{
 
     
-
+    
     _setValues(req){
         Object.entries(req).forEach(
             ([key, value]) =>{
@@ -23,11 +23,11 @@ class Cliente{
         this.email			    = "";
         this.telefone		    = "";
         this.celular		        = "";
-
+        
         this._setValues(req);
     }
 
-    getAttribures(){
+    getAttributes(){
         return this;
     }
 
